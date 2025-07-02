@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Base.Models
+namespace Base.Models.Enums
 {
-    public enum ChannelType
+    public enum OrderStatus
     {
-        SuPay = 1,
-        Omipay = 2
+        Created = 1,
+        Paid = 2,
+        Settled = 3
     }
 }

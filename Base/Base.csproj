@@ -7,7 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Channels\" />
+    <PackageReference Include="Flurl.Http" Version="4.0.2" />
+    <PackageReference Include="FreeSql" Version="3.5.209" />
+    <PackageReference Include="FreeSql.Extensions.BaseEntity" Version="3.5.209" />
+    <PackageReference Include="FreeSql.Extensions.Linq" Version="3.5.209" />
+    <PackageReference Include="FreeSql.Provider.MySql" Version="3.5.209" />
+    <PackageReference Include="FreeSql.Repository" Version="3.5.209" />
+    <PackageReference Include="Snowflake.Core" Version="2.0.0" />
   </ItemGroup>
 
 </Project>
