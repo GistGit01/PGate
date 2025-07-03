@@ -7,8 +7,8 @@ namespace Base.Models
     public class Order:Entity<Order>
     {
         private Order() {}
-        public Order(long channelId, string channelName, string channelOrderId, string outOrderId, string currency, decimal amount, 
-            string narrative, string? payUrl, string? redirectUrl)
+        public Order(long channelId, string channelName, string channelOrderId, string outOrderId, string currency, decimal amount,
+            string narrative, string? payUrl, string? redirectUrl, long channelMerchantId, long customerId)
         {
             ChannelId = channelId;
             ChannelName = channelName;
@@ -20,6 +20,8 @@ namespace Base.Models
             Narrative = narrative;
             PayUrl = payUrl;
             RedirectUrl = redirectUrl;
+            ChannelMerchantId = channelMerchantId;
+            CustomerId = customerId;
         }
 
         public long ChannelId { get; private set; }
@@ -29,6 +31,10 @@ namespace Base.Models
 
         [Column(StringLength = 50)]
         public string ChannelOrderId { get; private set; }
+
+        public long ChannelMerchantId { get; private set; }
+
+        public long CustomerId { get; private set; }
 
         [Column(StringLength = 50)]
         public string OutOrderId { get; private set; }

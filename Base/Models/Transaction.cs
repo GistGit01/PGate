@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Base.Models
 {
+    [Table(Name ="transaction")]
     public class Transaction:Entity<Transaction>
     {
         private Transaction() {}

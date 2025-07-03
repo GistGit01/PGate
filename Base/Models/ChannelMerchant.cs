@@ -2,18 +2,19 @@
 
 namespace Base.Models
 {
-    [Table(Name ="merchant")]
-    public class Merchant :Entity<Merchant>
+    [Table(Name ="channel_merchant")]
+    public class ChannelMerchant :Entity<ChannelMerchant>
     {
-        private Merchant() {}
+        private ChannelMerchant() {}
 
-        public Merchant(string name, long channelId, string channelName,  string channelSecretKey, string channelMerchantNumber)
+        public ChannelMerchant(string name, long channelId, string channelName,  string channelSecretKey, string channelMerchantNumber, long customerId)
         {
             Name = name;
             ChannelId = channelId;
             ChannelSecretKey = channelSecretKey;
             ChannelMerchantNumber = channelMerchantNumber;
             ChannelName = channelName;
+            CustomerId = customerId;
         }
 
         [Column(StringLength = 200)]
@@ -29,6 +30,6 @@ namespace Base.Models
         [Column(StringLength = 30)]
         public string ChannelMerchantNumber { get; private set; }
 
-        
+        public long CustomerId { get; set; }
     }
 }

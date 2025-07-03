@@ -18,7 +18,7 @@ namespace Base.ChannelIntergrations
             _notifyUrl = notifyUrl;
         }
 
-        public IChannelIntergration CreateInstance(Merchant merchant)
+        public IChannelIntergration CreateInstance(ChannelMerchant merchant)
         {
             switch (merchant.ChannelName.ToUpper())
             {

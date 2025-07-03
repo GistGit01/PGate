@@ -11,6 +11,8 @@ namespace Base.ChannelIntergrations
 {
     public interface IChannelIntergration
     {
+        Task<decimal> GetExchangeRateAsync(PaymentPlatform platform, string originCurrency, string targetCurrency);
+
         Task<Order> CreateOrderAsync(PaymentPlatform platform, string currency, decimal amount, string orderId, string narrative, string? redirectUrl);
 
         OrderStatus QueryOrder(string channelOrderId);

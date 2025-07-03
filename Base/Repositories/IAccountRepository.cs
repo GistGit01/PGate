@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Base.Repositories
 {
-    public interface IMerchantRepository:IBaseRepository<Merchant, long>, IScoped
+    public interface IAccountRepository: IBaseRepository<Account, long>, IScoped
     {
     }
 }

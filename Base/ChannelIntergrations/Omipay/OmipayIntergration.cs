@@ -18,8 +18,66 @@ namespace Base.ChannelIntergrations.Omipay
     {
         private const string BASE_URL = @"https://www.omipay.com.cn/omipay/api/v2";
 
-        private readonly Merchant _merchant;
+        private readonly ChannelMerchant _merchant;
         private readonly string _notifyUrl;
+
+        #region Respnose Models
+
+        private class OmipayResponseModel
+        {
+            public string return_code { get; set; }
+
+            public bool success => return_code == "SUCCESS";
+
+            public string? error_code { get; set; }
+
+            public string? error_msg { get; set; }
+
+            public virtual T SolveError<T>() where T: OmipayResponseModel
+            {
+                if (!success)
+                    throw new Exception($"[{error_code}]: {error_msg}");
+                return (T)this;
+            }
+        }
+
+        private class CreateJSAPIOrderResponseModel : OmipayResponseModel
+        {
+            public string order_no { get; set; }
+            public string pay_url { get; set; }
+        }
+
+        private class ExchangeRateResponseModel : OmipayResponseModel
+        {
+            public decimal rate { get; set; }
+        }
+
+        #endregion 
+
+
+
+        public async Task<decimal> GetExchangeRateAsync(PaymentPlatform platform, string originCurrency, string targetCurrency)
+        {
+            string platformStr = "";
+            if (platform == PaymentPlatform.WechatPay)
+                platformStr = "WECHATPAY";
+            else if (platform == PaymentPlatform.Alipay)
+                platformStr = "ALIPAY";
+            else
+                throw new Exception("Platform not supported");
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "currency", originCurrency },
+                { "base_currency", targetCurrency },
+                { "platform", platformStr }
+            };
+
+            var url = GenerateUrl("GetExchangeRate", parameters);
+            var response = await url.PostAsync();
+            var rateResponseModel = await response.GetJsonAsync<ExchangeRateResponseModel>();
+            return rateResponseModel.SolveError<ExchangeRateResponseModel>().rate;
+        }
 
         public async Task<Order> CreateOrderAsync(PaymentPlatform platform, string currency, decimal amount, string orderId, string narrative, string? redirectUrl)
         {
@@ -50,19 +108,6 @@ namespace Base.ChannelIntergrations.Omipay
             return new Order(_merchant.ChannelId, _merchant.ChannelName, orderResponseModel.order_no, "", currency, amount, narrative, orderResponseModel.pay_url, redirectUrl);
         }
 
-        private class OmipayResponseModel
-        {
-            public string return_code { get; set; }
-
-            public bool success => return_code == "SUCCESS";            
-        }
-
-        private class CreateJSAPIOrderResponseModel : OmipayResponseModel
-        {
-            public string order_no { get; set; }
-            public string pay_url { get; set; }
-        }
-
         public OrderStatus QueryOrder(string channelOrderId)
         {
             throw new NotImplementedException();
@@ -78,7 +123,7 @@ namespace Base.ChannelIntergrations.Omipay
             throw new NotImplementedException();
         }
 
-        public OmipayIntergration(Merchant merchant, string notifyUrl)
+        public OmipayIntergration(ChannelMerchant merchant, string notifyUrl)
         {
             _merchant = merchant;
             _notifyUrl = notifyUrl;

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base", "Base\Base.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST", "TEST\TEST.csproj", "{83350093-FFF3-4057-9E1D-F5B1711D813A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSqlRepositories", "FSqlRepositories\FSqlRepositories.csproj", "{6989A9BB-005C-4C0D-879E-0202D746C2FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{83350093-FFF3-4057-9E1D-F5B1711D813A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83350093-FFF3-4057-9E1D-F5B1711D813A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83350093-FFF3-4057-9E1D-F5B1711D813A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6989A9BB-005C-4C0D-879E-0202D746C2FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6989A9BB-005C-4C0D-879E-0202D746C2FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6989A9BB-005C-4C0D-879E-0202D746C2FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6989A9BB-005C-4C0D-879E-0202D746C2FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
