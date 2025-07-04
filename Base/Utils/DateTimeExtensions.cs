@@ -16,5 +16,18 @@ namespace Base.Utils
             var targetDateTime = TimeZoneInfo.ConvertTimeFromUtc(originDateTime, targetTimezoneInfo);
             return targetDateTime;
         }
+
+        public static DateTime GetCurrentDateInSpecificTimezone(this DateTime originDateTime, string timezoneId)
+        {
+            var targetDateTime = originDateTime.ConvertToSpecificTimezone(timezoneId);
+            return targetDateTime.Date;
+        }
+
+        public static double ToUnixTimeStamp(this DateTime datetime)
+        {
+            DateTime startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            var timeStamp = (datetime.ToUniversalTime() - startTime).TotalMilliseconds;
+            return timeStamp;
+        }
     }
 }

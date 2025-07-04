@@ -13,12 +13,12 @@ namespace Base.ChannelIntergrations
     {
         Task<decimal> GetExchangeRateAsync(PaymentPlatform platform, string originCurrency, string targetCurrency);
 
-        Task<Order> CreateOrderAsync(PaymentPlatform platform, string currency, decimal amount, string orderId, string narrative, string? redirectUrl);
+        Task<(string channelOrderId, string payUrl)> CreateOrderAsync(PaymentPlatform platform, string currency, decimal amount, string orderId, string narrative, string? redirectUrl);
 
-        OrderStatus QueryOrder(string channelOrderId);
+        Task<(OrderStatus status, DateTime? payTime)> QueryOrderAsync(string channelOrderId);
 
-        Refund RefundOrder(string channelOrderId, decimal amount, string refundId);
+        Task<(string channelRefundId, DateTime refundTime)> RefundOrderAsync(string channelOrderId, decimal amount, string refundId);
 
-        RefundStatus QueryRefund(string channelRefundId);
+        Task<RefundStatus> QueryRefundAsync(string channelRefundId);
     }
 }

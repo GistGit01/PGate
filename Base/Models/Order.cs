@@ -7,21 +7,44 @@ namespace Base.Models
     public class Order:Entity<Order>
     {
         private Order() {}
-        public Order(long channelId, string channelName, string channelOrderId, string outOrderId, string currency, decimal amount,
-            string narrative, string? payUrl, string? redirectUrl, long channelMerchantId, long customerId)
+        public Order(long channelId, string channelName, string outOrderId, string currency, decimal amount,
+            string narrative, string? redirectUrl, long channelMerchantId, long customerId)
         {
             ChannelId = channelId;
             ChannelName = channelName;
-            ChannelOrderId = channelOrderId;
+            ChannelOrderId = "";
             OutOrderId = outOrderId;
             Status = OrderStatus.Created;
             Currency = currency;
             Amount = amount;
             Narrative = narrative;
-            PayUrl = payUrl;
             RedirectUrl = redirectUrl;
             ChannelMerchantId = channelMerchantId;
             CustomerId = customerId;
+        }
+
+        public void SubmittedToChannel(string channelOrderId, string payUrl = "")
+        {
+            if (this.Status != OrderStatus.Created)
+                throw new Exception("订单状态错误");
+
+            this.Status = OrderStatus.SubmittedToChannel;
+            this.PayUrl = payUrl;
+        }
+
+        public void Paid(DateTime payTime)
+        {
+            if (this.Status != OrderStatus.SubmittedToChannel)
+                throw new Exception("订单状态错误");
+            this.Status = OrderStatus.Paid;
+            this.PayTime = payTime;
+        }
+
+        public void Settled()
+        {
+            if (this.Status != OrderStatus.Paid)
+                throw new Exception("订单状态错误");
+            this.Status = OrderStatus.Settled;
         }
 
         public long ChannelId { get; private set; }
@@ -39,7 +62,7 @@ namespace Base.Models
         [Column(StringLength = 50)]
         public string OutOrderId { get; private set; }
 
-        public DateTime? PayTime { get; private set; }
+        public DateTime PayTime { get; private set; } = DateTime.MinValue;
 
         public OrderStatus Status { get; private set; }
 

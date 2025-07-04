@@ -10,17 +10,29 @@ namespace Base.Models
     [Table(Name = "payment_rule")]
     public class PaymentRule : Entity<PaymentRule>
     {
-        public PaymentRule(long channelId, string channelName, int merchantPaymentFrequencyLowerLimit, decimal orderAmountUpperLimit, decimal dailyAmountUpperLimit, string timezoneName, int availableTimeRangeStartHour, int availableTimeRangeEndHour, string currency)
+        public PaymentRule(long channelId,
+                           string channelName,
+                           int merchantPaymentFrequencyLowerLimit,
+                           string currency,
+                           decimal orderAmountUpperLimit,
+                           decimal dailyAmountUpperLimit,
+                           int dailyCountUpperLimitForMerchant,
+                           int dailyCountUpperLimitForCustomer,
+                           string timezoneId,
+                           int availableTimeRangeStartHour,
+                           int availableTimeRangeEndHour)
         {
             ChannelId = channelId;
             ChannelName = channelName;
             MerchantPaymentFrequencyLowerLimit = merchantPaymentFrequencyLowerLimit;
+            Currency = currency;
             OrderAmountUpperLimit = orderAmountUpperLimit;
             DailyAmountUpperLimit = dailyAmountUpperLimit;
-            TimezoneName = timezoneName;
+            DailyCountUpperLimitForMerchant = dailyCountUpperLimitForMerchant;
+            DailyCountUpperLimitForCustomer = dailyCountUpperLimitForCustomer;
+            TimezoneId = timezoneId;
             AvailableTimeRangeStartHour = availableTimeRangeStartHour;
             AvailableTimeRangeEndHour = availableTimeRangeEndHour;
-            Currency = currency;
         }
 
         private PaymentRule() { }
@@ -39,8 +51,12 @@ namespace Base.Models
 
         public decimal DailyAmountUpperLimit { get; private set; }
 
+        public int DailyCountUpperLimitForMerchant { get; private set; }
+
+        public int DailyCountUpperLimitForCustomer { get; private set; }
+
         [Column(StringLength = 100)]
-        public string TimezoneName { get; private set; }
+        public string TimezoneId { get; private set; }
 
         public int AvailableTimeRangeStartHour { get; private set; }
 

@@ -10,6 +10,8 @@ namespace Base.Models.Enums
     {
         Created = 1,
         Refunded = 2,
-        Settled = 3
+        Settled = 3,
+        Cancelled = 90,
+        Failed = 99
     }
 }

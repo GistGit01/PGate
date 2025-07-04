@@ -11,6 +11,7 @@ using Google.Protobuf.WellKnownTypes;
 using System.Security.Cryptography;
 using System.Text.Encodings.Web;
 using Flurl;
+using Base.Utils;
 
 namespace Base.ChannelIntergrations.Omipay
 {
@@ -41,10 +42,100 @@ namespace Base.ChannelIntergrations.Omipay
             }
         }
 
-        private class CreateJSAPIOrderResponseModel : OmipayResponseModel
+        private class CreateOrderResponseModel : OmipayResponseModel
         {
             public string order_no { get; set; }
             public string pay_url { get; set; }
+        }
+
+        private class QueryOrderResponseModel : OmipayResponseModel
+        {
+            public string out_order_no { get; set; }
+
+            public string currency { get; set; }
+
+            public int amount { get; set; }
+
+            public decimal amountInDecimal => amount.ToCurrencyDecimal(currency);
+
+            public string pay_currency { get; set; }
+
+            public int pay_amount { get; set; }
+
+            public decimal payAmountInDecimal => pay_amount.ToCurrencyDecimal(pay_currency);
+
+            public DateTime order_time { get; set; }
+
+            public DateTime? pay_time { get; set; }
+
+            public int exchange_rate { get; set; }
+
+            public decimal ExchangeRateInDecimal => (Decimal)exchange_rate / 100000000;
+
+            public string result_code { get; set; }
+
+            public OrderStatus Status
+            {
+                get
+                {
+                    switch (result_code)
+                    {
+                        case "READY": return OrderStatus.SubmittedToChannel;
+                        case "PAYING": return OrderStatus.SubmittedToChannel;
+                        case "PAID": return OrderStatus.Paid;
+                        case "CLOSED": return OrderStatus.Settled;
+                        case "CANCELLED": return OrderStatus.CANCELLED;
+                        case "FAILED": return OrderStatus.FAILED;
+                        default: throw new Exception("状态错误");
+                    }
+                }
+            }
+        }
+
+        private class RefundResponseModel:OmipayResponseModel
+        {
+            public string refund_no { get; set; }
+
+            public string currency { get; set; }
+
+            public int amount { get; set; }
+
+            public decimal AmountInDecimal => amount.ToCurrencyDecimal(currency);
+
+            public DateTime refund_time { get; set; }
+        }
+
+        private class QueryRefundResponseModel : OmipayResponseModel
+        {
+            public string result_code { get; set; }
+
+            public string out_refund_no { get; set; }
+
+            public string currency { get; set; }
+
+            public int amount { get; set; }
+
+            public decimal AmountInDecimal => amount.ToCurrencyDecimal(currency);
+
+            public DateTime refund_time { get; set; }
+
+            public DateTime? success_time { get; set; }
+
+            public RefundStatus Status
+            {
+                get
+                {
+                    switch (return_code)
+                    {
+                        case "Applied": return RefundStatus.Created;
+                        case "Paymentchannelconfirmed": return RefundStatus.Refunded;
+                        case "Cleared": return RefundStatus.Settled;
+                        case "CustomerCancelled": return RefundStatus.Cancelled;
+                        case "OrganizationFailed": return RefundStatus.Failed;
+                        default: return RefundStatus.Created;
+                    }
+                }
+            }
         }
 
         private class ExchangeRateResponseModel : OmipayResponseModel
@@ -52,9 +143,15 @@ namespace Base.ChannelIntergrations.Omipay
             public decimal rate { get; set; }
         }
 
-        #endregion 
+        #endregion
 
+        public OmipayIntergration(ChannelMerchant merchant, string notifyUrl)
+        {
+            _merchant = merchant;
+            _notifyUrl = notifyUrl;
+        }
 
+        #region APIs
 
         public async Task<decimal> GetExchangeRateAsync(PaymentPlatform platform, string originCurrency, string targetCurrency)
         {
@@ -79,13 +176,52 @@ namespace Base.ChannelIntergrations.Omipay
             return rateResponseModel.SolveError<ExchangeRateResponseModel>().rate;
         }
 
-        public async Task<Order> CreateOrderAsync(PaymentPlatform platform, string currency, decimal amount, string orderId, string narrative, string? redirectUrl)
+        public async Task<(string channelOrderId, string payUrl)> CreateOrderAsync(PaymentPlatform platform, string currency, decimal amount, string orderId, string narrative, string? redirectUrl)
         {
             switch(platform)
             {
                 case PaymentPlatform.WechatPay:
+                    return await CreateJSAPIOrderAsync(currency, amount, orderId, narrative, redirectUrl);
+                case PaymentPlatform.Alipay:
+                case PaymentPlatform.AlipayPlus:
+                    return await CreateOnlineOrderAsync(platform, currency, amount, orderId, narrative, redirectUrl);
+                default:
+                    throw new Exception("不支持的支付平台");
+            }
+        }
+
+        private async Task<(string channelOrderId, string payUrl)> CreateJSAPIOrderAsync(string currency, decimal amount, string orderId, string narrative, string? redirectUrl)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { "order_name", narrative },
+                { "currency", currency },
+                { "amount", amount.ToCurrencyInt(currency) },
+                { "notify_url", UrlEncoder.Default.Encode(_notifyUrl) },
+                { "redirect_url", redirectUrl??"" },
+                { "out_order_no", orderId }
+            };
+
+            var url = GenerateUrl("MakeJSAPIOrder", parameters);
+            var response = await url.PostAsync();
+            var orderResponseModel = await response.GetJsonAsync<CreateOrderResponseModel>();
+            orderResponseModel.SolveError<CreateOrderResponseModel>();
+            return (channelOrderId: orderResponseModel.order_no, payUrl: orderResponseModel.pay_url);
+        }
+
+        private async Task<(string channelOrderId, string payUrl)> CreateOnlineOrderAsync(PaymentPlatform platform, string currency, decimal amount, string orderId, string narrative, string? redirectUrl)
+        {
+            var platformStr = "ALIPAYONLINE";
+            switch (platform)
+            {
+                case PaymentPlatform.WechatPay:
+                    platformStr = "WECHATPAY";
                     break;
                 case PaymentPlatform.Alipay:
+                    platformStr = "ALIPAYONLINE";
+                    break;
+                case PaymentPlatform.AlipayPlus:
+                    platformStr = "ALIPAYPLUS";
                     break;
                 default:
                     throw new Exception("Not support");
@@ -95,39 +231,64 @@ namespace Base.ChannelIntergrations.Omipay
             {
                 { "order_name", narrative },
                 { "currency", currency },
-                { "amount", amount },
+                { "amount", amount.ToCurrencyInt(currency) },
                 { "notify_url", UrlEncoder.Default.Encode(_notifyUrl) },
-                { "redirect_url", redirectUrl??"" },
-                { "out_order_no", orderId }
+                { "return_url", redirectUrl??"" },
+                { "out_order_no", orderId },
+                { "type", "web" },
+                { "platform", platformStr }
             };
 
-            var url = GenerateUrl("MakeJSAPIOrder", parameters);
+            var url = GenerateUrl("MakeOnlineOrder", parameters);
             var response = await url.PostAsync();
-            var orderResponseModel = await response.GetJsonAsync<CreateJSAPIOrderResponseModel>();
-
-            return new Order(_merchant.ChannelId, _merchant.ChannelName, orderResponseModel.order_no, "", currency, amount, narrative, orderResponseModel.pay_url, redirectUrl);
+            var orderResponseModel = await response.GetJsonAsync<CreateOrderResponseModel>();
+            orderResponseModel.SolveError<CreateOrderResponseModel>();
+            return (channelOrderId: orderResponseModel.order_no, payUrl: orderResponseModel.pay_url);
         }
 
-        public OrderStatus QueryOrder(string channelOrderId)
+        public async Task<(OrderStatus status, DateTime? payTime)> QueryOrderAsync(string channelOrderId)
         {
-            throw new NotImplementedException();
+            var parameters = new Dictionary<string, object>
+            {
+                { "order_no", channelOrderId }
+            };
+
+            var url = GenerateUrl("QueryOrder", parameters);
+            var response = await url.PostAsync();
+            var queryResponseModel = await response.GetJsonAsync<QueryOrderResponseModel>();
+            queryResponseModel.SolveError<QueryOrderResponseModel>();
+            return (queryResponseModel.Status, queryResponseModel.pay_time);
         }
 
-        public RefundStatus QueryRefund(string channelRefundId)
+        public async Task<RefundStatus> QueryRefundAsync(string channelRefundId)
         {
-            throw new NotImplementedException();
+            var parameters = new Dictionary<string, object>
+            {
+                { "refund_no", channelRefundId }
+            };
+            var url = GenerateUrl("QueryRefund", parameters);
+            var response = await url.PostAsync();
+            var queryResponseModel = await response.GetJsonAsync<QueryRefundResponseModel>();
+            queryResponseModel.SolveError<QueryRefundResponseModel>();
+            return queryResponseModel.Status;
         }
 
-        public Refund RefundOrder(string channelOrderId, decimal amount, string refundId)
+        public async Task<(string channelRefundId, DateTime refundTime)> RefundOrderAsync(string channelOrderId, decimal amount, string currency)
         {
-            throw new NotImplementedException();
+            var parameters = new Dictionary<string, object>
+            {
+                { "order_no", channelOrderId },
+                { "amount", amount.ToCurrencyInt(currency) }
+            };
+
+            var url = GenerateUrl("Refund", parameters);
+            var response = await url.PostAsync();
+            var refundResponseModel = await response.GetJsonAsync<RefundResponseModel>();
+            refundResponseModel.SolveError<RefundResponseModel>();
+            return (channelRefundId: refundResponseModel.refund_no, refundTime: refundResponseModel.refund_time);
         }
 
-        public OmipayIntergration(ChannelMerchant merchant, string notifyUrl)
-        {
-            _merchant = merchant;
-            _notifyUrl = notifyUrl;
-        }
+        #endregion
 
         private (string nonceStr, long timeStamp, string sign) GenerateSignParams()
         {

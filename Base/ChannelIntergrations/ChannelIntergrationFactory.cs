@@ -11,19 +11,16 @@ namespace Base.ChannelIntergrations
 {
     public class ChannelIntergrationFactory : ISingleton
     {
-        private readonly string _notifyUrl;
-
-        public ChannelIntergrationFactory(string notifyUrl)
+        public ChannelIntergrationFactory()
         {
-            _notifyUrl = notifyUrl;
         }
 
-        public IChannelIntergration CreateInstance(ChannelMerchant merchant)
+        public IChannelIntergration CreateInstance(ChannelMerchant merchant, string notifyUrl)
         {
             switch (merchant.ChannelName.ToUpper())
             {
                 case "OMIPAY":
-                    return new OmipayIntergration(merchant, _notifyUrl);
+                    return new OmipayIntergration(merchant, notifyUrl);
                 default:
                     throw new Exception("Channel not support");
             }
