@@ -25,13 +25,13 @@ namespace Base.Services.Orders
             _summaryRepository = summaryRepository;
         }
 
-        public async Task<Order> CreateOrderAsync(long customerId, PaymentPlatform platform, long channelId, string orderCurrency, decimal amount, string outOrderId, string narrative, string notifyUrl, string? redirectUrl = null)
+        public async Task<Order> CreateOrderAsync(long customerId, PaymentPlatform platform, long channelId, string orderCurrency, decimal amount, string outOrderId, string narrative, string notifyUrl, string? outNotifyUrl, string? redirectUrl = null)
         {
             // 1. 分配下单商户
             var merchant = await JudgeAccourdingRuleAsync(customerId, platform, channelId, orderCurrency, amount, notifyUrl);
 
             // 2. 创建订单
-            var order = new Order(channelId, merchant.ChannelName, outOrderId, orderCurrency, amount, narrative, redirectUrl, merchant.Id, customerId);
+            var order = new Order(channelId, merchant.ChannelName, outOrderId, orderCurrency, amount, narrative, redirectUrl, merchant.Id, customerId, outNotifyUrl);
             await order.InsertAsync();
 
             // 2. 向商户下单

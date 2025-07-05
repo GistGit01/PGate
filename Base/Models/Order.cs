@@ -8,7 +8,7 @@ namespace Base.Models
     {
         private Order() {}
         public Order(long channelId, string channelName, string outOrderId, string currency, decimal amount,
-            string narrative, string? redirectUrl, long channelMerchantId, long customerId)
+            string narrative, string? redirectUrl, long channelMerchantId, long customerId, string? notifyUrl)
         {
             ChannelId = channelId;
             ChannelName = channelName;
@@ -21,6 +21,7 @@ namespace Base.Models
             RedirectUrl = redirectUrl;
             ChannelMerchantId = channelMerchantId;
             CustomerId = customerId;
+            NotifyUrl = notifyUrl;
         }
 
         public void SubmittedToChannel(string channelOrderId, string payUrl = "")
@@ -85,5 +86,7 @@ namespace Base.Models
         public string? PayUrl { get; private set; }
 
         public string? RedirectUrl { get; private set; }
+
+        public string? NotifyUrl { get; private set; }
     }
 }

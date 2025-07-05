@@ -11,7 +11,7 @@ namespace WebAPI.Utils
         {
             if (context.ExceptionHandled == false)
             {
-                string message = "";
+                string message = context.Exception.Message;
                 string returnCode = "FAIL";
 
                 var response = ResultModel.Fail(message, returnCode);

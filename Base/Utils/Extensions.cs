@@ -1,5 +1,6 @@
 ﻿using Base.Models;
 using FreeSql;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -68,6 +69,34 @@ namespace Base.Utils
             }
 
             return services;
+        }
+
+        public static void InitTestData(this IApplicationBuilder app, IFreeSql freeSql)
+        {
+            var sql = @"
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+
+-- ----------------------------
+-- Records of channel
+-- ----------------------------
+INSERT INTO `channel` VALUES (1, 'OMIPAY', '2025-07-05 11:32:32.000', '2025-07-05 11:32:34.000', 1);
+
+-- ----------------------------
+-- Records of channel_merchant
+-- ----------------------------
+INSERT INTO `channel_merchant` VALUES (1, 'RR Surfer', 1, 'OMIPAY', 'c6c86d21d2c140a08e2b41c789aec5ae', '000034', 1, '2025-07-05 11:34:03.000', '2025-07-05 11:34:05.000', 1);
+
+-- ----------------------------
+-- Records of customer
+-- ----------------------------
+INSERT INTO `customer` VALUES (1, 'TEST', 'test@test.com', 'abc.1234', '86497200595011f098b100ffccae5c0a', '2025-07-05 11:31:48.000', '2025-07-05 11:31:56.000', 1);
+
+
+SET FOREIGN_KEY_CHECKS = 1;
+";
+            freeSql.Ado.ExecuteNonQuery(sql);
         }
     }
 

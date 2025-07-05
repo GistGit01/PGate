@@ -49,6 +49,9 @@ namespace WebAPI
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+
+                //var freeSql = app.Services.GetRequiredService<IFreeSql>();
+                //app.InitTestData(freeSql);
             }
 
             app.UseAuthorization();
