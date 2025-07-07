@@ -71,6 +71,8 @@ namespace WebAPI
 
             services.AddFreeSql(DataType.MySql, configuration.GetConnectionString("MySqlMasterDatabase"), isProduction);
 
+            services.AddMemoryCache();
+
             services.AddRepositories();
 
             services.AddServices();

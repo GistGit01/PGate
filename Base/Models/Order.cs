@@ -22,6 +22,7 @@ namespace Base.Models
             ChannelMerchantId = channelMerchantId;
             CustomerId = customerId;
             NotifyUrl = notifyUrl;
+            RefundAmount = 0M;
         }
 
         public void SubmittedToChannel(string channelOrderId, string payUrl = "")
@@ -46,6 +47,13 @@ namespace Base.Models
             if (this.Status != OrderStatus.Paid)
                 throw new Exception("订单状态错误");
             this.Status = OrderStatus.Settled;
+        }
+
+        public void Refund(decimal amount)
+        {
+            if (amount + RefundAmount > Amount)
+                throw new Exception("退款金额过大");
+            RefundAmount += amount;
         }
 
         public long ChannelId { get; private set; }
@@ -88,5 +96,7 @@ namespace Base.Models
         public string? RedirectUrl { get; private set; }
 
         public string? NotifyUrl { get; private set; }
+
+        public decimal RefundAmount { get; private set; } = 0M;
     }
 }

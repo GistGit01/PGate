@@ -8,9 +8,9 @@ namespace WebAPI.Models
 
     }
 
-    public abstract class RequestModelBase : IRequestModel
+    public abstract class APIRequestModelBase : IRequestModel
     {
-        public RequestModelBase()
+        public APIRequestModelBase()
         {
 
         }
@@ -44,7 +44,7 @@ namespace WebAPI.Models
         public string? NonceString { get; set; } = null!;
     }
 
-    public sealed class RequestModel : RequestModelBase
+    public sealed class RequestModel : APIRequestModelBase
     {
 
     }
@@ -100,5 +100,15 @@ namespace WebAPI.Models
         ///// </summary>
         //[JsonPropertyName("errorCode")]
         //public string? ErrorCode { get; private set; }
+    }
+
+    public abstract class PortalRequestModelBase : IRequestModel
+    {
+        public string Token { get; set; }
+    }
+
+    public sealed class PortalRequestModel : PortalRequestModelBase
+    {
+
     }
 }

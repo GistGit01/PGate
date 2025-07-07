@@ -12,7 +12,7 @@ namespace Base.Models
     [Table(Name = "refund")]
     public class Refund : Entity<Refund>
     {
-        public Refund(long channelId, string channelName, long orderId, string channelOrderId, PaymentPlatform platform, decimal refundAmount, decimal feeAmount, string currency)
+        public Refund(long channelId, string channelName, long orderId, string channelOrderId, PaymentPlatform platform, decimal refundAmount, string currency)
         {
             ChannelId = channelId;
             ChannelName = channelName;
@@ -20,16 +20,17 @@ namespace Base.Models
             ChannelOrderId = channelOrderId;
             Platform = platform;
             RefundAmount = refundAmount;
-            FeeAmount = feeAmount;
             Currency = currency;
             Status = RefundStatus.Created;
         }
 
-        public void Refunded(string orderRefundId)
+        public void Refunded(string channelRefundId, decimal feeAmount = 0M)
         {
             if (Status != RefundStatus.Created)
                 throw new Exception("退款单状态错误");
             Status = RefundStatus.Refunded;
+            FeeAmount = feeAmount;
+            ChannelRefundId = channelRefundId;
         }
 
         public void Settled()
@@ -63,6 +64,6 @@ namespace Base.Models
         public RefundStatus Status { get; private set; }
 
         [Column(StringLength = 50)]
-        public string PlatformRefundId { get; private set; } = "";
+        public string ChannelRefundId { get; private set; } = "";
     }
 }

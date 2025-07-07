@@ -1,9 +1,9 @@
 ﻿using Base.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace WebAPI.Models.Orders
+namespace WebAPI.Models.API
 {
-    public class CreateOrderRequest : RequestModelBase
+    public class CreateOrderRequest : APIRequestModelBase
     {
         [Display(Name ="平台")]
         [Required(ErrorMessage = "{0}为必传参数")]

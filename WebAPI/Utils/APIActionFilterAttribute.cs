@@ -11,7 +11,7 @@ namespace WebAPI.Utils
 
         private (long? customerId, long? timeStamp, string? nonceString, string? sign) GetSignParamsFromContext(ActionExecutingContext context)
         {
-            var requestModel = context.ActionArguments.FirstOrDefault().Value as RequestModelBase;
+            var requestModel = context.ActionArguments.FirstOrDefault().Value as APIRequestModelBase;
             if (requestModel == null)
                 throw new Exception("请求格式错误");
 

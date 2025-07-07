@@ -27,7 +27,7 @@ namespace Base.Utils
             return sign;
         }
 
-        private static string MakeSign(string originString)
+        public static string MakeSign(string originString)
         {
             var sha256 = SHA256.Create();
             var bytes = System.Text.Encoding.UTF8.GetBytes(originString);
