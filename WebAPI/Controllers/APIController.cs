@@ -1,7 +1,7 @@
 ﻿using Base.Repositories;
 using Base.Services.Orders;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Models.Orders;
+using WebAPI.Models.API;
 using WebAPI.Utils;
 
 namespace WebAPI.Controllers

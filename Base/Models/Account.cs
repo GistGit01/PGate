@@ -10,16 +10,19 @@ namespace Base.Models
     [Table(Name ="account")]
     public class Account:Entity<Account>
     {
-        public Account(string number, long channelId, string channelName, decimal balance, string currency)
+        public Account(string number, long channelId, string channelName, decimal balance, string currency, long customerId)
         {
             Number = number;
             ChannelId = channelId;
             ChannelName = channelName;
             Balance = balance;
             Currency = currency;
+            CustomerId = customerId;
         }
 
         private Account() {}
+
+        public long CustomerId { get; private set; }
 
         public string Number { get; private set; }
 

@@ -42,11 +42,31 @@ namespace WebAPI.Controllers
         [PortalActionFilter]
         [Route("signout")]
         [HttpPost]
-        public async Task<ResultModel> SignoutAsync([FromBody] PortalRequestModel request, [FromServices] IMemoryCache cache)
+        public ResultModel Signout([FromBody] PortalRequestModel request, [FromServices] IMemoryCache cache)
         {
             cache.Remove(request.Token);
 
             return new ResultModel();
         }
+
+        [PortalActionFilter]
+        [Route("getAccounts")]
+        [HttpPost]
+        public async Task<GetAccountsResult> GetAccountsAsync([FromBody]GetAccountsRequest request, [FromServices]IAccountRepository accountRepository)
+        {
+            var accounts = await accountRepository.Where(p => p.CustomerId == Customer.Id).ToListAsync();
+            return new GetAccountsResult
+            {
+                Accounts = accounts
+            };
+        }
+
+        //[PortalActionFilter]
+        //[Route("getAccountTransactions")]
+        //[HttpPost]
+        //public async Task<GetAccountTransactionsResult> GetAccountTransactionsAsync([FromBody] GetAccountTransactionsRequest request, [FromServices]ITransactionRepository transactionRepository)
+        //{
+            
+        //}
     }
 }
