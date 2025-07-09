@@ -7,7 +7,7 @@ using WebAPI.Utils;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("/api/[controller]")]
+    [Route("/[controller]")]
     public class APIController : APIBaseController
     {
         private readonly CreateOrderService _createOrderService;

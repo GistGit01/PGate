@@ -13,6 +13,7 @@ namespace Base.Utils
             if (!TimeZoneInfo.TryFindSystemTimeZoneById(timezoneId, out TimeZoneInfo? targetTimezoneInfo))
                 throw new Exception("Invalid Timezone Id");
             var utcDateTime = originDateTime.ToUniversalTime();
+            
             var targetDateTime = TimeZoneInfo.ConvertTimeFromUtc(originDateTime, targetTimezoneInfo);
             return targetDateTime;
         }

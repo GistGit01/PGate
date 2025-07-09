@@ -8,7 +8,7 @@ using WebAPI.Utils;
 
 namespace WebAPI.Controllers
 {
-    [Route("/portal/[controller]")]
+    [Route("/[controller]")]
     public class PortalController : PortalBaseController
     {
         private readonly ICustomerRepository _customerRepository;

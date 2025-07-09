@@ -62,7 +62,7 @@ namespace Base.Services.Orders
             if (amountForRule >= rule.OrderAmountUpperLimit)
                 throw new Exception("单笔金额超限");
 
-            var todayInChannel = DateTime.Now.ConvertToSpecificTimezone(rule.TimezoneId);
+            var todayInChannel = DateTime.UtcNow.ConvertToSpecificTimezone(rule.TimezoneId);
             var records = await _summaryRepository.Where(p => p.CustomerId == customerId && p.SummaryDate >= todayInChannel.AddDays(-1)).ToListAsync();
 
             // 判断当日限额（按客户）
@@ -80,7 +80,7 @@ namespace Base.Services.Orders
             // 根据交易频率规则选出可下单的商户列表
             var lastOrderTime = DateTime.UtcNow.AddMinutes(-rule.MerchantPaymentFrequencyLowerLimit);
             var unavailableMerchantsForFrequencyRule = records.Where(p => p.LastOrderDateTime >= lastOrderTime).Select(p => p.ChannelMerchantId).ToList();
-            var availableMerchants = await _channelMerchantRepository.Where(p => !p.IsDeleted && p.CustomerId == customerId && !unavailableMerchantsForFrequencyRule.Contains(p.Id)).ToListAsync();
+            var availableMerchants = await _channelMerchantRepository.Where(p => p.CustomerId == customerId && !unavailableMerchantsForFrequencyRule.Contains(p.Id)).ToListAsync();
             if (!availableMerchants.Any())
                 throw new Exception("交易频率过高");
 
